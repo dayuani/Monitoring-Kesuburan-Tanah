@@ -36,12 +36,11 @@ def login():
     try:
         user = request.form.get('username')
         pwd = request.form.get('password')
-        micro = request.form.get('id_micro')
 
         if not (user and pwd):
             return jsonify({'status': 'error', 'message': 'Incomplete data'}), 400
 
-        response = supabase.table('user').select('username', 'password', 'id_micro').execute()
+        response = supabase.table('user').select('username', 'password').execute()
         
         berhasil = False
         for row in response.data:
@@ -50,8 +49,7 @@ def login():
                 break
         
         if berhasil:
-            return redirect(url_for('chart/'))
-        
+            return redirect(url_for('chart1'))
         else:
             return jsonify({'status': 'error', 'message': 'Username atau password salah'}), 401
 
@@ -135,22 +133,11 @@ def save_prediction_to_supabase(last_prediction):
         app.logger.error("Error in save_prediction_to_supabase: %s", e)
 
 
-@app.route('/chart/<micro>')
-def chart(micro):
-    try:
-        return render_template('chart1.html', micro=micro)
-    except Exception as e:
-        app.logger.error("Error rendering chart: %s", e)
-        return jsonify({'status': 'error', 'message': 'Internal Server Error'}), 500
 
-@app.route('/chart1/<micro>')
-def chart1(micro):
+
+@app.route("/1")
+def chart1():
     try:
-        data = fetch_data_for_micro(micro)
-        
-        if data:
-            return render_template('chart1.html', data=data)
-        else:
         return render_template('chart1.html')
     except Exception as e:
         app.logger.error("Error rendering chart1: %s", e)
@@ -163,16 +150,6 @@ def chart2():
     except Exception as e:
         app.logger.error("Error rendering chart2: %s", e)
         return jsonify({'status': 'error', 'message': 'Internal Server Error'}), 500
-    
-# @app.route("/chart")
-# def chart():
-#     try:
-#         return render_template('chart.html')
-#     except Exception as e:
-#         app.logger.error("Error rendering chart: %s", e)
-#         return jsonify({'status': 'error', 'message': 'Internal Server Error'}), 500
-    
-
 
 
 @app.route("/test-connection", methods=['GET'])
